@@ -1,0 +1,25 @@
+.header{
+    background-color: white;
+    box-shadow: 3px 2px 4px 0px;
+    height: 72px;
+    border-bottom: 1px #1890ff solid;
+    margin-bottom: 4px;
+}
+.container{
+    background: white;
+    padding: 21px;
+    height: unset !important;
+}
+.ant-table-container{
+    border: 1px #f1f1f1 solid;
+}
+.title-location{
+    display: flex;
+}
+.ant-modal-title{
+    text-align: center;
+    font-size: 24px;
+}
+.toggle{
+    display: inline !important; 
+}

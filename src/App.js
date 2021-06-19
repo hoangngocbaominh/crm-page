@@ -1,24 +1,37 @@
-import logo from './logo.svg';
-import './App.css';
-
+import "./App.css";
+import "antd/dist/antd.css";
+import Products from "./layouts/pages/products/Products";
+import Orders from "./layouts/pages/orders/Orders";
+import Dashboard from "./layouts/pages/dashboard/Dashboard";
+import Login from "./layouts/pages/login/Login";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from "react-router-dom";
 function App() {
+  const token = localStorage.getItem("accessToken");
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Router>
+        <Switch>
+          {token ? (
+            <>
+              <Route exact path="/" component={Dashboard} />
+              <Route exact path="/dashboard" component={Dashboard} />
+              <Route exact path="/products" component={Products} />
+              <Route exact path="/orders" component={Orders} />
+            </>
+          ) : (
+            <>
+              <Redirect to="/auth/login"></Redirect>
+              <Route exact path="/auth/login" component={Login} />
+            </>
+          )}
+        </Switch>
+      </Router>
+    </>
   );
 }
 
