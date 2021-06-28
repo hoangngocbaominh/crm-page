@@ -24,7 +24,7 @@ export const requester = () => {
     function post(uri, params) {
       return axios.post(baseURL + uri,params, {
         headers:{
-          authorization: `Bearer ${localStorage.getItem('access_token')}`
+          authorization: `Bearer ${localStorage.getItem('accessToken')}`
         }
       }).catch((err) => {
         if (err.response) {
@@ -42,7 +42,7 @@ export const requester = () => {
     }
     function destroy(uri, params) {
       return axios.delete(baseURL + uri, { params, headers:{
-        authorization: `Bearer ${localStorage.getItem('access_token')}`
+        authorization: `Bearer ${localStorage.getItem('accessToken')}`
       } }).catch((err) => {
         if (err.response) {
           // client received an error response (5xx, 4xx)
@@ -60,7 +60,7 @@ export const requester = () => {
     function update(uri, params) {
       return axios.patch(baseURL + uri, params, {
         headers:{
-          authorization: `Bearer ${localStorage.getItem('access_token')}`
+          authorization: `Bearer ${localStorage.getItem('accessToken')}`
         }
       }).catch((err) => {
         if (err.response) {

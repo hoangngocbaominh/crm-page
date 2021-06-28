@@ -10,6 +10,7 @@ import {
   Route,
   Redirect,
 } from "react-router-dom";
+import ProductDetail from "./layouts/pages/products/ProductDetail";
 function App() {
   const token = localStorage.getItem("accessToken");
   return (
@@ -18,14 +19,20 @@ function App() {
         <Switch>
           {token ? (
             <>
+              <Route
+                exact
+                path="/auth/login"
+                component={() => <Redirect to="dashboard" />}
+              />
               <Route exact path="/" component={Dashboard} />
               <Route exact path="/dashboard" component={Dashboard} />
               <Route exact path="/products" component={Products} />
               <Route exact path="/orders" component={Orders} />
+              <Route exact path="/products/:id" component={ProductDetail} />
             </>
           ) : (
             <>
-              <Redirect to="/auth/login"></Redirect>
+              <Route component={() => <Redirect to="/auth/login" />} />
               <Route exact path="/auth/login" component={Login} />
             </>
           )}

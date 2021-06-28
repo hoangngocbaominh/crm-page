@@ -2,5 +2,5 @@
     height: 100vh;
 }
 .container .ant-form-item-control-input-content{
-    text-align: end ;
+    margin-left: 34px;
 }

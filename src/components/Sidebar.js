@@ -12,12 +12,12 @@ function Sidebar(props) {
   let location = useLocation();
   console.log(location.pathname);
   const locationLink = () => {
-    switch (location.pathname) {
-      case "/dashboard":
+    switch (true) {
+      case location.pathname.includes("/dashboard"):
         return "1";
-      case "/products":
+      case location.pathname.includes("/products"):
         return "2";
-      case "/orders":
+      case location.pathname.includes("/orders"):
         return "3";
 
       default:

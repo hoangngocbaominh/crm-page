@@ -27,6 +27,12 @@ function Login(props) {
       span: 6,
     },
   };
+  const buttonLayout = {
+    wrapperCol: {
+      offset: 14,
+      span: 10,
+    },
+  };
   const onFinish = (values) => {
     setLoading(true);
     requester()
@@ -98,7 +104,7 @@ function Login(props) {
             <Checkbox>Remember me</Checkbox>
           </Form.Item>
 
-          <Form.Item {...tailLayout}>
+          <Form.Item {...buttonLayout}>
             <Button type="primary" htmlType="submit">
               Submit
             </Button>

@@ -22,7 +22,7 @@ const tailLayout = {
 };
 
 function ModalEdit(props) {
-  const { visibleEdit, onCancel, editProductItem, filter, handleEditProduct } =
+  const { visibleEdit, onCancel, editProductItem, filter, handleEditProduct, categories } =
     props;
   const [isLoading, setIsLoading] = useState(false);
   const [form] = Form.useForm();
@@ -32,14 +32,25 @@ function ModalEdit(props) {
   };
   const editProduct = (values) => {
     console.log(values);
+    const newValues = {
+      ...values,
+      price: Number.parseFloat(values.price),
+    };
     setIsLoading(true);
     requester()
-      .update(`products/${editProductItem.id}`, values)
+      .update(`products/${editProductItem.id}`, newValues)
       .then(() => {
         requester()
           .get("products", filter)
           .then((res) => {
-            const result = res.data.data;
+            let result = res.data.data;
+            result = result.map((item) => {
+              const findName = categories.find((c) => item.categoryId === c.id);
+              return {
+                ...item,
+                categoryName: findName.name,
+              };
+            });
             if (!handleEditProduct) return;
             handleEditProduct(result);
             setIsLoading(false);

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, {useRef } from "react";
 import PropTypes from "prop-types";
 import { Input } from "antd";
 
@@ -12,15 +12,6 @@ Search.propsDefault = {
 function Search(props) {
   const { handleSearchProduct, filter } = props;
   const valueCurentRef = useRef();
-
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     if (!localStorage.getItem("searchTerm")) return;
-  //     handleSearchProduct(localStorage.getItem("searchTerm"));
-  //   }, 600);
-  //   return clearTimeout();
-  // }, []);
-
   const searchProduct = (e) => {
     const value = e.target.value;
     if (valueCurentRef.current) {
@@ -30,13 +21,12 @@ function Search(props) {
       if (!handleSearchProduct) return;
       handleSearchProduct(value);
     }, 300);
-    // sessionStorage.setItem("searchTerm", value);
   };
 
   return (
     <>
       <Input
-        placeholder="Nhập tên sản phẩm để tìm kiếm"
+        placeholder="Nhập tên sản phẩm"
         onChange={(e) => searchProduct(e)}
         defaultValue={filter.name_like}
       />

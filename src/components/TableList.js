@@ -3,30 +3,25 @@ import {
   Button,
   Col,
   Pagination,
-  Popconfirm,
   Row,
   Space,
   Spin,
   Table,
   Tag,
+  Typography,
+  Tooltip,
 } from "antd";
+import { Link } from "react-router-dom";
 import { requester } from "../services/axios";
 import ModalCreate from "../layouts/pages/products/ModalCreate";
-import ModalEdit from "../layouts/pages/products/ModalEdit";
 import Search from "./Search";
 import RangePriceSearching from "./RangePriceSearching";
 import queryString from "query-string";
-import {
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  EyeOutlined,
-} from "@ant-design/icons";
+import { PlusOutlined, EyeOutlined } from "@ant-design/icons";
+import SwitchStatusCustom from "../layouts/pages/products/SwitchStatusCustom";
 function TableList(props) {
   const [productList, setProductList] = useState([]);
   const [visible, setVisible] = useState(false);
-  const [visibleEdit, setVisibleEdit] = useState(false);
-  const [editProductItem, seteditProductItem] = useState({});
   const [loading, setLoading] = useState(false);
   const [totalRows, setTotalRows] = useState(0);
   const [categories, setCategories] = useState([]);
@@ -85,21 +80,14 @@ function TableList(props) {
         console.log(error);
       });
   }, []);
+
   const showModalCreate = () => {
     console.log("true");
     setVisible(true);
   };
-  const showModalEdit = (recordItemProduct) => {
-    setVisibleEdit(true);
-    seteditProductItem({
-      ...recordItemProduct,
-    });
-  };
+
   const hideModalCreate = () => {
     setVisible(false);
-  };
-  const hideModalEdit = () => {
-    setVisibleEdit(false);
   };
 
   const columns = [
@@ -120,7 +108,7 @@ function TableList(props) {
       key: "price",
       width: "10%",
       align: "center",
-      render: (record) => <Tag color="green"> {record.price} </Tag>,
+      render: (record) => <Tag color="green"> {record.price} $ </Tag>,
     },
     {
       title: "Màu",
@@ -143,28 +131,19 @@ function TableList(props) {
       align: "center",
       width: "20%",
 
-      render: (record) =>
-        productList.length >= 1 ? (
+      render: (record) => {
+        return productList.length >= 1 ? (
           <Space size="middle">
-            <Button
-              style={{ color: "#1890ff", borderColor: "#1890ff" }}
-              onClick={() => showModalEdit(record)}
-            >
-              <EditOutlined />
-              Edit
-            </Button>
-
-            <Popconfirm
-              title="Sure to delete?"
-              onConfirm={() => handleDeleteProductItem(record)}
-            >
-              <Button danger>
-                <DeleteOutlined />
-                Delete
-              </Button>
-            </Popconfirm>
+            <Tooltip title="Chi tiết sản phẩm" color="blue">
+              <Link to={`/products/${record.id}`}>
+                <EyeOutlined style={{ fontSize: "25px", color: "#1890ff" }} />
+              </Link>
+            </Tooltip>
+            
+              <SwitchStatusCustom record={record} />
           </Space>
-        ) : null,
+        ) : null;
+      },
     },
   ];
 
@@ -176,7 +155,14 @@ function TableList(props) {
         requester()
           .get("products", filter)
           .then((res) => {
-            const result = res.data.data;
+            let result = res.data.data;
+            result = result.map((item) => {
+              const findName = categories.find((c) => item.categoryId === c.id);
+              return {
+                ...item,
+                categoryName: findName.name,
+              };
+            });
             setProductList(result);
             setLoading(false);
           });
@@ -184,7 +170,6 @@ function TableList(props) {
   };
 
   const getPageNumber = (value, pageSize) => {
-    console.log("page", pageSize);
     setFilter({
       ...filter,
       _page: value,
@@ -196,10 +181,7 @@ function TableList(props) {
     setProductList(newProductList);
     setVisible(false);
   };
-  const handleEditProduct = (productEdited) => {
-    setProductList(productEdited);
-    setVisibleEdit(false);
-  };
+
   const handleSearchProduct = (searchTerm) => {
     setFilter({
       ...filter,
@@ -208,37 +190,46 @@ function TableList(props) {
     });
   };
   const handleSearchRangePrice = (rangePrice) => {
-    const splitString = rangePrice.split(" ");
-    const min = parseInt(splitString[0]);
-    const max = parseInt(splitString[1]);
-    console.log(min, max);
+    console.log(rangePrice);
+
     setFilter({
       ...filter,
       _page: 1,
-      price_lte: max,
-      price_gte: min,
+      price_lte: rangePrice.max,
+      price_gte: rangePrice.min,
+      status: rangePrice.status,
     });
   };
-  // const handleCategoriesProduct = (value) => {
-  //   console.log(value)
 
-  // }
+  const pagination = () => (
+    <Pagination
+      style={{
+        textAlign: "end",
+        marginTop: "30px",
+        marginRight: "43px",
+        marginBottom: "10px",
+      }}
+      onChange={getPageNumber}
+      pageSize={initialFilter._limit || 5}
+      total={totalRows}
+      current={pageNumberRef.current}
+      defaultPageSize={10}
+      pageSizeOptions={[5, 10, 15, 20, 30, , 40, , 50, 100]}
+    />
+  );
   return (
     <Spin spinning={loading}>
       <Row gutter={[16, 16]}>
         <Col span={6}>
           <Search handleSearchProduct={handleSearchProduct} filter={filter} />
         </Col>
-        <Col span={12}>
+        <Col span={14}>
           <RangePriceSearching
             handleSearchRangePrice={handleSearchRangePrice}
             filter={filter}
           />
         </Col>
-        {/* <Col span={4} style={{paddingRight:"33px"}}>
-          <CategoriesSort categories={categories} handleCategoriesProduct={handleCategoriesProduct}/>
-        </Col> */}
-        <Col span={6}>
+        <Col span={4}>
           <Button
             style={{
               textAlign: "end",
@@ -249,35 +240,31 @@ function TableList(props) {
             type="primary"
             onClick={showModalCreate}
           >
-            <PlusOutlined /> Create
+            <PlusOutlined /> Tạo mới
           </Button>
         </Col>
       </Row>
-
-      <Table dataSource={productList} columns={columns} pagination={false} />
-
-      <Pagination
-        style={{ textAlign: "end", marginTop: "25px", marginRight: "43px" }}
-        onChange={getPageNumber}
-        pageSize={initialFilter._limit || 5}
-        total={totalRows}
-        current={pageNumberRef.current}
-        defaultPageSize={10}
-        pageSizeOptions={[5, 10, 15, 20, 30, , 40, , 50, 100]}
+      {pagination()}
+      <Typography.Title
+        level={5}
+        style={{ float: "right", marginRight: "44px", marginBottom: "15px" }}
+      >
+        Tổng số sản phẩm: {totalRows}
+      </Typography.Title>
+      <Table
+        dataSource={productList}
+        columns={columns}
+        pagination={false}
+        bordered
       />
+      {pagination()}
+
       <ModalCreate
         visible={visible}
         onCancel={hideModalCreate}
         requestNewProductListCreated={getNewProductListCreated}
         filter={filter}
         categories={categories}
-      />
-      <ModalEdit
-        filter={filter}
-        visibleEdit={visibleEdit}
-        onCancel={hideModalEdit}
-        editProductItem={editProductItem}
-        handleEditProduct={handleEditProduct}
       />
     </Spin>
   );

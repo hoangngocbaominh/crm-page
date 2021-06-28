@@ -1,57 +1,76 @@
-import React, { useEffect, useState } from "react";
+import React, { useRef } from "react";
 import PropTypes from "prop-types";
-import { Button, Input, Select } from "antd";
+import { Button, Input, Form, Select } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
-
+const { Option } = Select;
 RangePriceSearching.propTypes = {
   handleSearchRangePrice: PropTypes.func,
 };
 RangePriceSearching.propDefault = {
   handleSearchRangePrice: null,
 };
-const { Option } = Select;
 function RangePriceSearching(props) {
-  const [rangePrice, setRangePrice] = useState("");
+  const [form] = Form.useForm();
   const { handleSearchRangePrice, filter } = props;
-  // useEffect(() => {
-  //   // if (!localStorage.getItem("rangePrice")) return;
-  //   // handleSearchRangePrice(localStorage.getItem("rangePrice"));
-  //   setTimeout(() => {
-  //     if (!sessionStorage.getItem("rangePrice")) return;
-  //     handleSearchRangePrice(sessionStorage.getItem("rangePrice"));
-  //   }, 600);
-  //   return clearTimeout();
-  // }, []);
-  const searchRangePrice = (value) => {
-    console.log(value);
-    setRangePrice(value);
+  const statusRef = useRef(true);
+
+  const getValueStatus = (valueStatus) => {
+    statusRef.current = valueStatus;
   };
-  const handleRangePrice = () => {
-    if(!rangePrice) return;
+  const handleRangePrice = (value) => {
+    console.log(value);
+
+    if (value.min === "") {
+      value.min = null;
+    }
+    if (value.max === "") {
+      value.max = null;
+    }
     if (!handleSearchRangePrice) return;
-    handleSearchRangePrice(rangePrice);
-    // sessionStorage.setItem("rangePrice", rangePrice);
+    handleSearchRangePrice({ ...value, status: statusRef.current });
   };
   return (
-    <Input.Group>
-      <Select
-        defaultValue= {filter.price_lte>=0 && filter.price_gte>=0 ? `${filter.price_gte}-${filter.price_lte}` :  
-             "Chọn khoảng giá"}
-        onChange={(e) => searchRangePrice(e)}
-        style={{width:"150px"}}
+    <>
+      <Form
+        name="customized_form_controls"
+        layout="inline"
+        onFinish={handleRangePrice}
+        initialValues={
+          filter.price_lte >= 0 && filter.price_gte >= 0
+            ? {
+                min: filter.price_gte,
+                max: filter.price_lte,
+              }
+            : { min: null, max: null }
+        }
+        form={form}
       >
-        <Option value="0 10000">Mặc định</Option>
-        <Option value="0 100">0-100</Option>
-        <Option value="100 200">100-200</Option>
-        <Option value="200 300">200-300</Option>
-        <Option value="300 400">300-400</Option>
-        <Option value="400 1000">400-1000</Option>
-        {/* <Option value="400">400 Trở lên </Option> */}
-      </Select>
-      <Button onClick={handleRangePrice}>
-        <SearchOutlined />
-      </Button>
-    </Input.Group>
+        <Form.Item name="min">
+          <Input placeholder="Nhập giá tối thiểu" />
+        </Form.Item>
+        <Form.Item name="max">
+          <Input placeholder="Nhập giá tối đa" />
+        </Form.Item>
+        <Form.Item name="status">
+          <Select
+            showSearch
+            style={{ width: 200 }}
+            placeholder="Chọn trạng thái"
+            onChange={getValueStatus}
+            
+          >
+            <Option>Tất cả</Option>
+            <Option value={true}>Hoạt động</Option>
+            <Option value={false}>Tạm ngưng</Option>
+          </Select>
+        </Form.Item>
+        <Form.Item>
+          <Button type="primary" htmlType="submit">
+            <SearchOutlined />
+          </Button>
+        </Form.Item>
+      </Form>
+    </>
   );
 }
 

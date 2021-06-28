@@ -1,6 +1,16 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { Form, Input, Button, Modal, Spin, notification, Select } from "antd";
+import {
+  Form,
+  Input,
+  Button,
+  Modal,
+  Spin,
+  notification,
+  Select,
+  Upload,
+} from "antd";
+import { UploadOutlined } from "@ant-design/icons";
 import { requester } from "../../../services/axios";
 const { Option } = Select;
 ModalCreate.propTypes = {
@@ -35,15 +45,29 @@ function ModalCreate(props) {
 
   const getValueCreated = (values) => {
     console.log(values);
+    const thumbUrlList = values.thumbnailUrl
+    const listUrl = thumbUrlList.map((item) => item.thumbUrl);
+    console.log(listUrl)
+    const newValues = {
+      ...values,
+      price: Number.parseFloat(values.price),
+      thumbnailUrl: listUrl,
+    };
     setIsLoading(true);
     requester()
-      .post("products", values)
+      .post("products", newValues)
       .then(() => {
         requester()
           .get("products", filter)
           .then((res) => {
-            const result = res.data.data;
-            console.log(result);
+            let result = res.data.data;
+            result = result.map((item) => {
+              const findName = categories.find((c) => item.categoryId === c.id);
+              return {
+                ...item,
+                categoryName: findName.name,
+              };
+            });
             if (!requestNewProductListCreated) return;
             requestNewProductListCreated(result);
             setIsLoading(false);
@@ -59,6 +83,16 @@ function ModalCreate(props) {
   };
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
+  };
+
+  const normFile = (e) => {
+    console.log("Upload event:", e);
+
+    if (Array.isArray(e)) {
+      return e;
+    }
+
+    return e && e.fileList;
   };
 
   return (
@@ -118,9 +152,22 @@ function ModalCreate(props) {
           >
             <Input />
           </Form.Item>
-          {/* <Form.Item
+
+          <Form.Item
+            name="thumbnailUrl"
+            label="Upload"
+            valuePropName="fileList"
+            getValueFromEvent={normFile}
+            extra="image.jpg"
+          >
+            <Upload name="logo" action="/upload.do" listType="picture">
+              <Button icon={<UploadOutlined />}>Tải lên</Button>
+            </Upload>
+          </Form.Item>
+
+          <Form.Item
             label="Category"
-            name="categoryName"
+            name="categoryId"
             rules={[
               {
                 required: true,
@@ -130,10 +177,10 @@ function ModalCreate(props) {
           >
             <Select placeholder="Chọn loại sản phẩm" style={{ width: "100%" }}>
               {categories.map((item) => {
-                return <Option value={item.name}>{item.name}</Option>;
+                return <Option value={item.id}>{item.name}</Option>;
               })}
             </Select>
-          </Form.Item> */}
+          </Form.Item>
           <Form.Item {...tailLayout} style={{ textAlign: "end" }}>
             <Button type="primary" htmlType="submit">
               Submit
