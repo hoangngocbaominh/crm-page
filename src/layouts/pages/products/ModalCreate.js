@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import PropTypes from "prop-types";
 import {
   Form,
@@ -9,10 +9,15 @@ import {
   notification,
   Select,
   Upload,
+  Col,
+  Row,
+  Tag,
 } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import { UploadOutlined, CheckOutlined, EditOutlined } from "@ant-design/icons";
 import { requester } from "../../../services/axios";
+import { ChromePicker } from "react-color";
 const { Option } = Select;
+
 ModalCreate.propTypes = {
   onCancel: PropTypes.func,
 };
@@ -20,13 +25,6 @@ ModalCreate.propDefault = {
   onCancel: null,
 };
 function ModalCreate(props) {
-  const {
-    visible,
-    onCancel,
-    filter,
-    requestNewProductListCreated,
-    categories,
-  } = props;
   const layout = {
     labelCol: {
       span: 4,
@@ -35,6 +33,15 @@ function ModalCreate(props) {
       span: 20,
     },
   };
+  const {
+    visible,
+    onCancel,
+    filter,
+    requestNewProductListCreated,
+    categories,
+  } = props;
+  const [color, setColor] = useState("#fff");
+  const [showColorPicker, setShowColorPicker] = useState(false);
   const tailLayout = {
     wrapperCol: {
       offset: 3,
@@ -42,15 +49,15 @@ function ModalCreate(props) {
     },
   };
   const [isLoading, setIsLoading] = useState(false);
-
+  const colorRef = useRef("Chọn màu");
   const getValueCreated = (values) => {
-    console.log(values);
-    const thumbUrlList = values.thumbnailUrl
+    console.log(colorRef.current)
+    const thumbUrlList = values.thumbnailUrl;
     const listUrl = thumbUrlList.map((item) => item.thumbUrl);
-    console.log(listUrl)
     const newValues = {
       ...values,
       price: Number.parseFloat(values.price),
+      color: colorRef.current,
       thumbnailUrl: listUrl,
     };
     setIsLoading(true);
@@ -95,6 +102,11 @@ function ModalCreate(props) {
     return e && e.fileList;
   };
 
+  const colorHex = (value) => {
+    console.log(value.hex);
+    colorRef.current = value.hex;
+    setColor(value.hex);
+  };
   return (
     <Modal
       visible={visible}
@@ -139,18 +151,42 @@ function ModalCreate(props) {
           >
             <Input />
           </Form.Item>
-
-          <Form.Item
-            label="Color"
-            name="color"
-            rules={[
-              {
-                required: true,
-                message: "Please input color",
-              },
-            ]}
-          >
-            <Input />
+          <Form.Item label="Color">
+            <Row>
+              <Col span={21}>
+                <Row>
+                  <Col span={8}>
+                    <Tag
+                      style={{
+                        height: "30px",
+                        paddingTop: "3px",
+                        backgroundColor: colorRef.current
+                      }}
+                    >
+                      {colorRef.current}
+                    </Tag>
+                  </Col>
+                  <Col span={16}>
+                    {showColorPicker && (
+                      <ChromePicker
+                        style={{ width: "100px", height: "100px" }}
+                        color={color}
+                        onChange={colorHex}
+                      />
+                    )}
+                  </Col>
+                </Row>
+              </Col>
+              <Col span={3}>
+                <Button
+                  onClick={() =>
+                    setShowColorPicker((showColorPicker) => !showColorPicker)
+                  }
+                >
+                  {showColorPicker ? <CheckOutlined /> : <EditOutlined />}
+                </Button>
+              </Col>
+            </Row>
           </Form.Item>
 
           <Form.Item

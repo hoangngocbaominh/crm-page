@@ -61,7 +61,7 @@ function Login(props) {
   };
   return (
     <Spin spinning={isLoading}>
-      <div className="container">
+      <div className="wrap">
         <Typography.Title style={{ textAlign: "center", marginTop: "120px" }}>
           LOGIN
         </Typography.Title>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { Upload, Modal } from "antd";
+import { Upload, Modal, Button } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 UploadImg.propTypes = {};
 
@@ -18,7 +18,6 @@ function UploadImg(props) {
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [fileList, setFileList] = useState([]);
-  console.log(thumbnailList);
   useEffect(() => {
     setFileList(
       thumbnailList.map((item) => {
@@ -37,18 +36,15 @@ function UploadImg(props) {
     setPreviewVisible(true);
   };
   const handleChange = async ({ fileList }) => {
-    setFileList(fileList);
-    const newFileList = [];
 
-    for (const item of fileList) {
-      if (item.url) {
-        newFileList.push(item.url);
-      }
-      if (!item.url) {
-        newFileList.push(await getBase64(item.originFileObj));
-      }
-    }
-    updateThumbnailList(newFileList)
+    setFileList(fileList);
+    // const newFileList = [];
+
+    // for (const item of fileList) {
+    //     newFileList.push(await item.name);
+    // }
+    
+    updateThumbnailList(fileList)
   };
   const uploadButton = (
     <div>

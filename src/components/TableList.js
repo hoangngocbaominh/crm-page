@@ -34,6 +34,7 @@ function TableList(props) {
     name_like: initialFilter.name_like,
     price_lte: initialFilter.price_lte,
     price_gte: initialFilter.price_gte,
+    status: initialFilter.status,
   });
 
   useEffect(() => {
@@ -115,7 +116,18 @@ function TableList(props) {
       key: "color",
       width: "10%",
       align: "center",
-      render: (record) => <Tag>{record.color}</Tag>,
+      render: (record) => (
+        <Tag
+          style={{
+            height: "30px",
+            width: "60px",
+            paddingTop: "3px",
+            backgroundColor: record.color,
+          }}
+        >
+          {record.color}
+        </Tag>
+      ),
     },
     {
       title: "Loại sản phẩm",
@@ -139,8 +151,8 @@ function TableList(props) {
                 <EyeOutlined style={{ fontSize: "25px", color: "#1890ff" }} />
               </Link>
             </Tooltip>
-            
-              <SwitchStatusCustom record={record} />
+
+            <SwitchStatusCustom record={record} />
           </Space>
         ) : null;
       },
@@ -191,6 +203,8 @@ function TableList(props) {
   };
   const handleSearchRangePrice = (rangePrice) => {
     console.log(rangePrice);
+    // const newDate = rangePrice.updateAt.getTime();
+    // const newDate2 = rangePrice.createAt.getTime();
 
     setFilter({
       ...filter,
@@ -198,6 +212,8 @@ function TableList(props) {
       price_lte: rangePrice.max,
       price_gte: rangePrice.min,
       status: rangePrice.status,
+      // createAt_gte: newDate,
+      // createAt_lte: newDate2,
     });
   };
 
@@ -206,7 +222,7 @@ function TableList(props) {
       style={{
         textAlign: "end",
         marginTop: "30px",
-        marginRight: "43px",
+        marginRight: "35px",
         marginBottom: "10px",
       }}
       onChange={getPageNumber}
@@ -220,21 +236,11 @@ function TableList(props) {
   return (
     <Spin spinning={loading}>
       <Row gutter={[16, 16]}>
-        <Col span={6}>
-          <Search handleSearchProduct={handleSearchProduct} filter={filter} />
-        </Col>
-        <Col span={14}>
-          <RangePriceSearching
-            handleSearchRangePrice={handleSearchRangePrice}
-            filter={filter}
-          />
-        </Col>
-        <Col span={4}>
+        <Col span={24}>
           <Button
             style={{
               textAlign: "end",
               float: "right",
-              marginRight: "17px",
               marginBottom: "11px",
             }}
             type="primary"
@@ -242,6 +248,15 @@ function TableList(props) {
           >
             <PlusOutlined /> Tạo mới
           </Button>
+        </Col>
+        <Col span={4}>
+          <Search handleSearchProduct={handleSearchProduct} filter={filter} />
+        </Col>
+        <Col span={20}>
+          <RangePriceSearching
+            handleSearchRangePrice={handleSearchRangePrice}
+            filter={filter}
+          />
         </Col>
       </Row>
       {pagination()}

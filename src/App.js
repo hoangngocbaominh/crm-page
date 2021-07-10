@@ -22,7 +22,7 @@ function App() {
               <Route
                 exact
                 path="/auth/login"
-                component={() => <Redirect to="dashboard" />}
+                component={() => <Redirect to="/dashboard" />}
               />
               <Route exact path="/" component={Dashboard} />
               <Route exact path="/dashboard" component={Dashboard} />
